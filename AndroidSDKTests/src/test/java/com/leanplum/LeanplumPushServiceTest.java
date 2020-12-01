@@ -159,7 +159,6 @@ public class LeanplumPushServiceTest {
    * Tests that {@link LeanplumPushService#onStart()} calls the {@link
    * IPushProvider#updateRegistrationId()}.
    *
-   * @throws Exception
    */
   @Test
   public void testOnStartUpdatesRegistrationIds() throws Exception {
