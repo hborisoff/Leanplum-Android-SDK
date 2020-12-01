@@ -37,6 +37,8 @@ import com.leanplum.internal.APIConfig;
 import com.leanplum.internal.CollectionUtil;
 import com.leanplum.internal.Constants;
 import com.leanplum.internal.FileManager;
+import com.leanplum.internal.OperationQueue;
+import com.leanplum.internal.ShadowOperationQueue;
 import com.leanplum.internal.Util;
 import com.leanplum.tests.MainActivity;
 import com.leanplum.utils.SharedPreferencesUtil;
@@ -126,6 +128,8 @@ public class LeanplumPushServiceTest {
 
     customizeNotificationBuilderCalled = false;
     customizeNotificationBuilderCompatCalled = false;
+
+    TestClassUtil.setField(OperationQueue.class, "instance", new ShadowOperationQueue());
   }
 
   /**
@@ -155,25 +159,27 @@ public class LeanplumPushServiceTest {
     verify(pushProviders, times(1)).updateRegistrationIdsAndBackend();
   }
 
-  public static class ProviderStub implements IPushProvider {
-    @Override
-    public PushProviderType getType() {
-      return null;
-    }
-    @Override
-    public String getRegistrationId() {
-      return null;
-    }
-    @Override
-    public void setRegistrationId(String regId) {
-    }
-    @Override
-    public void unregister() {
-    }
-    @Override
-    public void updateRegistrationId() {
-    }
-  }
+//  public static class ProviderStub implements IPushProvider {
+//    boolean updated = false;
+//    @Override
+//    public PushProviderType getType() {
+//      return null;
+//    }
+//    @Override
+//    public String getRegistrationId() {
+//      return null;
+//    }
+//    @Override
+//    public void setRegistrationId(String regId) {
+//    }
+//    @Override
+//    public void unregister() {
+//    }
+//    @Override
+//    public void updateRegistrationId() {
+//      updated = true;
+//    }
+//  }
 
   /**
    * Tests that {@link LeanplumPushService#onStart()} calls the {@link
@@ -185,7 +191,7 @@ public class LeanplumPushServiceTest {
   public void testOnStartUpdatesRegistrationIds() throws Exception {
     spy(PushProviders.class);
 
-    IPushProvider fcmProviderMock = spy(new ProviderStub());
+    LeanplumFcmProvider fcmProviderMock = spy(new LeanplumFcmProvider());
     doNothing().when(fcmProviderMock).updateRegistrationId();
     PowerMockito.doReturn(fcmProviderMock).when(PushProviders.class, "createFcm");
     PushProviders pushProviders = new PushProviders();
