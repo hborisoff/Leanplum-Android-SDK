@@ -155,16 +155,37 @@ public class LeanplumPushServiceTest {
     verify(pushProviders, times(1)).updateRegistrationIdsAndBackend();
   }
 
+  public static class ProviderStub implements IPushProvider {
+    @Override
+    public PushProviderType getType() {
+      return null;
+    }
+    @Override
+    public String getRegistrationId() {
+      return null;
+    }
+    @Override
+    public void setRegistrationId(String regId) {
+    }
+    @Override
+    public void unregister() {
+    }
+    @Override
+    public void updateRegistrationId() {
+    }
+  }
+
   /**
    * Tests that {@link LeanplumPushService#onStart()} calls the {@link
    * IPushProvider#updateRegistrationId()}.
    *
+   * @throws Exception
    */
   @Test
   public void testOnStartUpdatesRegistrationIds() throws Exception {
     spy(PushProviders.class);
 
-    LeanplumFcmProvider fcmProviderMock = spy(new LeanplumFcmProvider());
+    IPushProvider fcmProviderMock = spy(new ProviderStub());
     doNothing().when(fcmProviderMock).updateRegistrationId();
     PowerMockito.doReturn(fcmProviderMock).when(PushProviders.class, "createFcm");
     PushProviders pushProviders = new PushProviders();
